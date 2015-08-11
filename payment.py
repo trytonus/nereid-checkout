@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    nereid-checkout
-
-    Payment handling capability for Checkout
-
-    :copyright: (c) 2014 by Openlabs Technologies & Consulting (P) LTD.
-    :license: GPLv3, see LICENSE for more details
-"""
 from trytond.model import ModelSQL, ModelView, fields
 from trytond.pool import PoolMeta, Pool
 

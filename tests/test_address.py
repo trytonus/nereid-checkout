@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-'''
-
-    nereid_checkout test address
-
-    :copyright: (c) 2015 by Openlabs Technologies & Consulting (P) Ltd.
-    :license: GPLv3, see LICENSE for more details
-'''
 import unittest
 import pycountry
 import datetime

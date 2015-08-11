@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-'''
-
-    nereid_checkout test suite
-
-    :copyright: (c) 2010-2015 by Openlabs Technologies & Consulting (P) Ltd.
-    :license: GPLv3, see LICENSE for more details
-'''
 import unittest
 from ast import literal_eval
 from mock import patch

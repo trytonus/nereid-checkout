@@ -1,13 +1,5 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-'''
-
-    Payment Gateway Setup
-
-    :copyright: (c) 2013-2015 by Openlabs Technologies & Consulting (P) Ltd.
-    :license: BSD, see LICENSE for more details
-
-'''
 import time
 import sys
 import re
@@ -95,8 +87,8 @@ requires = []
 MODULE = 'nereid_checkout'
 PREFIX = 'trytond'
 MODULE2PREFIX = {
-    'nereid_payment_gateway': 'openlabs',
-    'sale_payment_gateway': 'openlabs',
+    'nereid_payment_gateway': 'fio',
+    'sale_payment_gateway': 'fio',
     'email_queue': 'openlabs',
     'sale_confirmation_email': 'openlabs',
 }
@@ -118,9 +110,9 @@ setup(
     name='%s_%s' % (PREFIX, MODULE),
     version=info.get('version', '0.0.1'),
     description="Tryton module for Payment Gatway/Merchant Integration",
-    author="Openlabs Technologies & consulting (P) Limited",
-    author_email='info@openlabs.co.in',
-    url='http://www.openlabs.co.in',
+    author="Fulfil.IO Inc.",
+    author_email='support@fulfil.io',
+    url='https://www.fulfil.io',
     package_dir={'trytond.modules.%s' % MODULE: '.'},
     packages=[
         'trytond.modules.%s' % MODULE,
@@ -137,14 +129,14 @@ setup(
         'Development Status :: 4 - Beta',
         'Environment :: Plugins',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
+        'License :: OSI Approved :: BSD License',
         'Natural Language :: English',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
         'Framework :: Tryton',
         'Topic :: Office/Business',
     ],
-    license='GPL-3',
+    license='BSD',
     install_requires=requires,
     extras_require={
         'docs': ['sphinx', 'sphinx_rtd_theme'],
@@ -157,7 +149,7 @@ setup(
     test_suite='tests',
     test_loader='trytond.test_loader:Loader',
     tests_require=[
-        'openlabs_payment_gateway_authorize_net >= %s.%s, < %s.%s' % (
+        'fio_payment_gateway_authorize_net >= %s.%s, < %s.%s' % (
             major_version, minor_version, major_version, minor_version + 1
         ),
         'pycountry',
