@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    sale
-
-    Additional Changes to sale
-
-    :copyright: (c) 2011-2015 by Openlabs Technologies & Consulting (P) Limited
-    :license: GPLv3, see LICENSE for more details.
-"""
 import json
 from uuid import uuid4
 from datetime import date, datetime

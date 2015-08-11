@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    nereid-checkout
-
-    Nereid Checkout register and default checkout
-
-    :copyright: (c) 2010-2015 by Openlabs Technologies & Consulting (P) LTD.
-    :license: GPLv3, see LICENSE for more details
-"""
 import warnings
 from datetime import datetime
 from functools import wraps

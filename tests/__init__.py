@@ -1,12 +1,4 @@
 # -*- coding: utf-8 -*-
-"""
-    __init__
-
-    Add the test suite here so that setup.py test loader picks it up
-
-    :copyright: © 2013-2015 by Openlabs Technologies & Consulting (P) Limited
-    :license: GPLv3, see LICENSE for more details.
-"""
 import unittest
 import trytond.tests.test_tryton
 from test_checkout import TestCheckoutSignIn, TestCheckoutShippingAddress, \
