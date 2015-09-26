@@ -107,7 +107,7 @@ class Sale:
         # Try to find if the user can be shown the order
         access_code = request.values.get('access_code', None)
 
-        if current_user.is_anonymous():
+        if current_user.is_anonymous:
             if not access_code:
                 # No access code provided, user is not authorized to
                 # access order page
@@ -133,7 +133,7 @@ class Sale:
             for sale in sales:
 
                 # Change party name to invoice address name for guest user
-                if current_user.is_anonymous():
+                if current_user.is_anonymous:
                     sale.party.name = sale.invoice_address.name
                     sale.party.save()
 
@@ -141,7 +141,7 @@ class Sale:
         """
         Checks if payment profile belongs to right party
         """
-        if not current_user.is_anonymous() and \
+        if not current_user.is_anonymous and \
                 payment_profile.party != current_user.party:
             # verify that the payment profile belongs to the registered
             # user.
@@ -236,13 +236,13 @@ class Sale:
         if self.state not in self.comment_allowed_states:
             abort(403)
 
-        if current_user.is_anonymous():
+        if current_user.is_anonymous:
             access_code = request.values.get('access_code', None)
             if access_code and access_code == self.guest_access_code:
                 # No access code provided
                 comment_is_allowed = True
 
-        elif current_user.is_authenticated() and \
+        elif current_user.is_authenticated and \
                 current_user.party == self.party:
             comment_is_allowed = True
 
@@ -277,7 +277,7 @@ class Sale:
         """
         context = super(Sale, self)._get_email_template_context()
 
-        if has_request_context() and not current_user.is_anonymous():
+        if has_request_context() and not current_user.is_anonymous:
             customer_name = current_user.display_name
         else:
             customer_name = self.party.name
@@ -299,7 +299,7 @@ class Sale:
         to_emails = set()
         if self.party.email:
             to_emails.add(self.party.email.lower())
-        if has_request_context() and not current_user.is_anonymous() and \
+        if has_request_context() and not current_user.is_anonymous and \
                 current_user.email:
             to_emails.add(current_user.email.lower())
 

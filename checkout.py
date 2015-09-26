@@ -263,7 +263,7 @@ class Checkout(ModelView):
         NereidUser = Pool().get('nereid.user')
         Party = Pool().get('party.party')
 
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             form = cls.sign_in_form(
                 email=current_user.email,
                 checkout_mode='account',
@@ -338,7 +338,7 @@ class Checkout(ModelView):
                 else:
                     failed_login.send()
 
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             # Registered user with a fresh login can directly proceed to
             # step 2, which is filling the shipping address
             #
@@ -408,13 +408,13 @@ class Checkout(ModelView):
         cart = NereidCart.open_cart()
 
         address = None
-        if current_user.is_anonymous() and cart.sale.shipment_address:
+        if current_user.is_anonymous and cart.sale.shipment_address:
             address = cart.sale.shipment_address
 
         address_form = cls.get_new_address_form(address)
 
         if request.method == 'POST':
-            if not current_user.is_anonymous() and request.form.get('address'):
+            if not current_user.is_anonymous and request.form.get('address'):
                 # Registered user has chosen an existing address
                 address = Address(request.form.get('address', type=int))
 
@@ -431,7 +431,7 @@ class Checkout(ModelView):
                 if not address_form.validate():
                     address = None
                 else:
-                    if current_user.is_anonymous() and \
+                    if current_user.is_anonymous and \
                             cart.sale.shipment_address:
                         # Save to the same address if the guest user
                         # is just trying to update the address
@@ -467,7 +467,7 @@ class Checkout(ModelView):
                 )
 
         addresses = []
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             addresses.extend(current_user.party.addresses)
 
         return render_template(
@@ -536,7 +536,7 @@ class Checkout(ModelView):
         cart = NereidCart.open_cart()
 
         address = None
-        if current_user.is_anonymous() and cart.sale.invoice_address:
+        if current_user.is_anonymous and cart.sale.invoice_address:
             address = cart.sale.invoice_address
 
         address_form = cls.get_new_address_form(address)
@@ -566,7 +566,7 @@ class Checkout(ModelView):
                         url_for('nereid.checkout.payment_method')
                     )
 
-            if not current_user.is_anonymous() and request.form.get('address'):
+            if not current_user.is_anonymous and request.form.get('address'):
                 # Registered user has chosen an existing address
                 address = Address(request.form.get('address', type=int))
 
@@ -584,7 +584,7 @@ class Checkout(ModelView):
                     address = None
                 else:
                     if (
-                        current_user.is_anonymous() and
+                        current_user.is_anonymous and
                         cart.sale.invoice_address and
                         cart.sale.invoice_address != cart.sale.shipment_address
                     ):
@@ -623,7 +623,7 @@ class Checkout(ModelView):
                 )
 
         addresses = []
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             addresses.extend(current_user.party.addresses)
 
         return render_template(
@@ -656,7 +656,7 @@ class Checkout(ModelView):
         ]
 
         # add profiles of the registered user
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             payment_form.payment_profile.choices = [
                 (p.id, p.rec_name) for p in
                 current_user.party.get_payment_profiles()
@@ -682,7 +682,7 @@ class Checkout(ModelView):
         payment_form = cls.get_payment_form()
         credit_card_form = cls.get_credit_card_form()
 
-        if not current_user.is_anonymous() and \
+        if not current_user.is_anonymous and \
                 payment_form.payment_profile.data:
             # Regd. user with payment_profile
             rv = cart.sale._add_sale_payment(
