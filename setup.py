@@ -89,8 +89,8 @@ PREFIX = 'trytond'
 MODULE2PREFIX = {
     'nereid_payment_gateway': 'fio',
     'sale_payment_gateway': 'fio',
-    'email_queue': 'openlabs',
-    'sale_confirmation_email': 'openlabs',
+    'email_queue': 'fio',
+    'sale_confirmation_email': 'fio',
 }
 
 for dep in info.get('depends', []):
