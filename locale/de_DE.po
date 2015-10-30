@@ -1,4 +1,4 @@
-# 
+#
 msgid ""
 msgstr "Content-Type: text/plain; charset=utf-8\n"
 
@@ -102,11 +102,119 @@ msgctxt "model:nereid.website.payment_method,name:"
 msgid "Alternate payment gateway mechanisms"
 msgstr "Alternative Zahlunsgatewaymechanismen"
 
-msgctxt "model:res.group,name:order_confirmation_receivers"
+msgctxt "model:res.group,name:"
 msgid "Order Confirmation BCC receivers"
 msgstr "Bestellbestätigung BCC-Empfänger"
 
-msgctxt "nereid:sale.py:"
+msgctxt "nereid:checkout.py:138"
+msgid "01-January"
+msgstr "01-Januar"
+
+msgctxt "nereid:checkout.py:139"
+msgid "02-February"
+msgstr "02-Februar"
+
+msgctxt "nereid:checkout.py:140"
+msgid "03-March"
+msgstr "03-März"
+
+msgctxt "nereid:checkout.py:141"
+msgid "04-April"
+msgstr "04-April"
+
+msgctxt "nereid:checkout.py:142"
+msgid "05-May"
+msgstr "05-Mai"
+
+msgctxt "nereid:checkout.py:143"
+msgid "06-June"
+msgstr "06-Juni"
+
+msgctxt "nereid:checkout.py:144"
+msgid "07-July"
+msgstr "07-Juli"
+
+msgctxt "nereid:checkout.py:145"
+msgid "08-August"
+msgstr "08-August"
+
+msgctxt "nereid:checkout.py:146"
+msgid "09-September"
+msgstr "09-September"
+
+msgctxt "nereid:checkout.py:147"
+msgid "10-October"
+msgstr "10-Oktober"
+
+msgctxt "nereid:checkout.py:148"
+msgid "11-November"
+msgstr "11-November"
+
+msgctxt "nereid:checkout.py:149"
+msgid "12-December"
+msgstr "12-Dezember"
+
+msgctxt "nereid:checkout.py:178"
+msgid "Use shipping address as billing address"
+msgstr "Lieferadresse als Rechnungsdresse verwenden"
+
+msgctxt "nereid:checkout.py:181"
+msgid "Choose a card"
+msgstr "Wählen Sie eine Karte"
+
+msgctxt "nereid:checkout.py:186"
+msgid "Alternate payment methods"
+msgstr "Alternative Zahlungsmethoden"
+
+msgctxt "nereid:checkout.py:195"
+msgid "e-mail"
+msgstr "E-Mail"
+
+msgctxt "nereid:checkout.py:196"
+msgid "Password"
+msgstr "Passwort"
+
+msgctxt "nereid:checkout.py:199"
+msgid "Checkout as a guest"
+msgstr "Als Gast bestellen"
+
+msgctxt "nereid:checkout.py:200"
+msgid "Use my account"
+msgstr "Mein Konto verwenden"
+
+msgctxt "nereid:checkout.py:203"
+msgid "Remember Me"
+msgstr "Angemeldet bleiben"
+
+msgctxt "nereid:checkout.py:207"
+msgid "Password is required."
+msgstr "Passwort ist erforderlich."
+
+msgctxt "nereid:checkout.py:288"
+msgid "Guest with email: %(email)s"
+msgstr "Gast mit E-Mail: %(email)s"
+
+msgctxt "nereid:checkout.py:422"
+msgid "The address chosen is not valid"
+msgstr "Die ausgewählte Adresse ist ungültig"
+
+msgctxt "nereid:checkout.py:574"
+msgid "The address chosen is not valid"
+msgstr "Die gewählte Adresse ist ungültig"
+
+msgctxt "nereid:checkout.py:765"
+msgid "Error is processing payment."
+msgstr "Fehler bei der Durchführung der Zahlung."
+
+msgctxt "nereid:checkout.py:789"
+msgid "Your order #%(sale)s has been processed"
+msgstr "Ihre Bestellung Nr. %(sale)s wurde ausgeführt"
+
+msgctxt "nereid:sale.py:148"
+msgid "The payment profile chosen is invalid"
+msgstr "Das ausgewählte Zahlungsprofil ist ungültig."
+
+msgctxt "nereid:sale.py:262"
 msgid "Comment Added"
 msgstr "Kommentar hinzugefügt"
 
