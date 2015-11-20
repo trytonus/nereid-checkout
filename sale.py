@@ -8,7 +8,7 @@ from trytond.model import fields
 from trytond.pool import PoolMeta, Pool
 
 from nereid import render_template, request, abort, login_required, \
-    route, current_user, flash, redirect, url_for, jsonify
+    route, current_user, flash, redirect, url_for, jsonify, current_website
 from nereid.contrib.pagination import Pagination
 from nereid.ctx import has_request_context
 from trytond.transaction import Transaction
@@ -52,7 +52,7 @@ class Sale:
         filter_by = request.args.get('filter_by', None)
 
         domain = [
-            ('party', '=', request.nereid_user.party.id),
+            ('party', '=', current_user.party.id),
         ]
         req_date = (
             date.today() + relativedelta(months=-3)
@@ -116,7 +116,7 @@ class Sale:
                 # Invalid access code
                 abort(403)
         else:
-            if self.party.id != request.nereid_user.party.id:
+            if self.party.id != current_user.party.id:
                 # Order does not belong to the user
                 abort(403)
 
@@ -171,10 +171,10 @@ class Sale:
             AddSalePaymentWizard.create()[0]
         )
 
-        if request.nereid_website.credit_card_gateway and (
+        if current_website.credit_card_gateway and (
             payment_profile or credit_card_form
         ):
-            gateway = request.nereid_website.credit_card_gateway
+            gateway = current_website.credit_card_gateway
 
             if payment_profile:
                 self.validate_payment_profile(payment_profile)
