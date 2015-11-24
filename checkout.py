@@ -4,7 +4,7 @@ from datetime import datetime
 from functools import wraps
 
 from nereid import render_template, request, url_for, flash, redirect, \
-    current_app, current_user, route, login_required
+    current_app, current_user, route, login_required, current_website
 from nereid.signals import failed_login
 from nereid.globals import session
 from flask.ext.login import login_user
@@ -84,7 +84,7 @@ def sale_has_non_guest_party(function):
         NereidCart = Pool().get('nereid.cart')
         cart = NereidCart.open_cart()
         if cart.sale and \
-                cart.sale.party == request.nereid_website.guest_user.party:
+                cart.sale.party == current_website.guest_user.party:
             # The cart is owned by the guest user party
             current_app.logger.debug(
                 'Cart is owned by guest. Redirect to sign-in'
@@ -101,7 +101,7 @@ def with_company_context(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
         with Transaction().set_context(
-                company=request.nereid_website.company.id):
+                company=current_website.company.id):
             return function(*args, **kwargs)
     return wrapper
 
@@ -224,7 +224,7 @@ class Checkout(ModelView):
 
         existing = NereidUser.search([
             ('email', '=', email),
-            ('company', '=', request.nereid_website.company.id),
+            ('company', '=', current_website.company.id),
         ])
 
         return not existing
@@ -288,7 +288,7 @@ class Checkout(ModelView):
                 party_name = unicode(_(
                     'Guest with email: %(email)s', email=form.email.data
                 ))
-                if cart.sale.party == request.nereid_website.guest_user.party:
+                if cart.sale.party == current_website.guest_user.party:
                     # Create a party with the email as email, and session as
                     # name, but attach the session to it.
                     party, = Party.create([{
@@ -710,7 +710,7 @@ class Checkout(ModelView):
                 return rv
             return cls.confirm_cart(cart)
 
-        elif request.nereid_website.credit_card_gateway and \
+        elif current_website.credit_card_gateway and \
                 credit_card_form.validate():
             # validate the credit card form and checkout using that
             cart.sale._add_sale_payment(
@@ -834,7 +834,7 @@ class Address:
         form = cls.get_address_form()
 
         if request.method == 'POST' and form.validate_on_submit():
-            party = request.nereid_user.party
+            party = current_user.party
             address, = cls.create([{
                 'name': form.name.data,
                 'street': form.street.data,
@@ -894,14 +894,14 @@ class Address:
             return cls.create_address()
 
         address = cls(address)
-        if address.party != request.nereid_user.party:
+        if address.party != current_user.party:
             # Check if the address belong to party
             abort(403)
 
         form = cls.get_address_form(address)
 
         if request.method == 'POST' and form.validate_on_submit():
-            party = request.nereid_user.party
+            party = current_user.party
             cls.write([address], {
                 'name': form.name.data,
                 'street': form.street.data,
