@@ -586,7 +586,7 @@ class TestCheckoutShippingAddress(BaseTestCheckout):
                 addresses = Address.search([
                     ('party', '=', user.party.id),
                     ('street', '=', 'Biscayne Boulevard'),
-                    ('phone_number.value', '=', '1234567891'),
+                    ('phone', '=', '1234567891'),
                 ])
 
                 self.assertEqual(len(addresses), 1)
@@ -623,14 +623,6 @@ class TestCheckoutShippingAddress(BaseTestCheckout):
                     )),
                 ])
                 self.assertEqual(len(addresses), 2)
-
-                # Assert that contact mechanism is not duplicated
-                phone_number = ContactMechanism.search([
-                    ('type', '=', 'phone'),
-                    ('party', '=', current_user.party.id),
-                    ('value', '=', '1234567891'),
-                ])
-                self.assertEqual(len(phone_number), 1)
 
                 # Assert the new address is now the shipment_address
                 address, = Address.search([
@@ -1074,7 +1066,7 @@ class TestCheckoutBillingAddress(BaseTestCheckout):
                 addresses = Address.search([
                     ('party', '=', user.party.id),
                     ('street', '=', 'Biscayne Boulevard'),
-                    ('phone_number.value', '=', '1234567891'),
+                    ('phone', '=', '1234567891'),
                 ])
                 self.assertEqual(len(addresses), 1)
 
@@ -1110,14 +1102,6 @@ class TestCheckoutBillingAddress(BaseTestCheckout):
                     )),
                 ])
                 self.assertEqual(len(addresses), 2)
-
-                # Assert that contact mechanism is not duplicated
-                phone_number = ContactMechanism.search([
-                    ('type', '=', 'phone'),
-                    ('party', '=', current_user.party.id),
-                    ('value', '=', '1234567891'),
-                ])
-                self.assertEqual(len(phone_number), 1)
 
                 # Assert the new address is now the shipment_address
                 address, = Address.search([

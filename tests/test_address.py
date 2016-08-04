@@ -315,7 +315,7 @@ class TestAddress(NereidTestCase):
                 self.assertEqual(address.zip, address_data['zip'])
                 self.assertEqual(address.city, address_data['city'])
                 self.assertEqual(
-                    address.phone_number.value, address_data['phone']
+                    address.phone, address_data['phone']
                 )
                 self.assertEqual(address.country.id, address_data['country'])
                 self.assertEqual(
@@ -381,7 +381,7 @@ class TestAddress(NereidTestCase):
                 self.assertEqual(address.zip, address_data['zip'])
                 self.assertEqual(address.city, address_data['city'])
                 self.assertEqual(
-                    address.phone_number.value, address_data['phone']
+                    address.phone, address_data['phone']
                 )
                 self.assertEqual(address.country.id, address_data['country'])
                 self.assertEqual(
