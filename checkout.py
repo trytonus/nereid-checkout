@@ -17,7 +17,7 @@ from werkzeug.wrappers import BaseResponse
 from trytond.model import ModelView, fields
 from trytond.pool import Pool, PoolMeta
 from trytond.transaction import Transaction
-from trytond.pyson import Eval
+from trytond import backend
 
 from .i18n import _
 
@@ -449,12 +449,7 @@ class Checkout(ModelView):
                     address.subdivision = address_form.subdivision.data
 
                     if address_form.phone.data:
-                        # create contact mechanism
-                        phone = \
-                            cart.sale.party.add_contact_mechanism_if_not_exists(
-                                'phone', address_form.phone.data
-                            )
-                        address.phone_number = phone.id
+                        address.phone = address_form.phone.data
                     address.save()
 
             if address is not None:
@@ -604,12 +599,7 @@ class Checkout(ModelView):
                     address.subdivision = address_form.subdivision.data
 
                     if address_form.phone.data:
-                        # create contact mechanism
-                        phone = \
-                            cart.sale.party.add_contact_mechanism_if_not_exists(
-                                'phone', address_form.phone.data
-                            )
-                        address.phone_number = phone.id
+                        address.phone = address_form.phone.data
 
                     address.save()
 
@@ -803,13 +793,27 @@ class Address:
     """
     __name__ = 'party.address'
 
-    phone_number = fields.Many2One(
-        'party.contact_mechanism', 'Phone',
-        domain=[
-            ('type', '=', 'phone'),
-            ('party', '=', Eval('party'))
-        ], depends=['party'], select=True
-    )
+    phone = fields.Char("Phone", select=True)
+
+    @classmethod
+    def __register__(cls, module_name):
+        TableHandler = backend.get('TableHandler')
+        cursor = Transaction().cursor
+        ContactMech = Pool().get('party.contact_mechanism')
+        sql_table = cls.__table__()
+        contact_mech_table = ContactMech.__table__()
+
+        super(Address, cls).__register__(module_name)
+
+        table = TableHandler(cursor, cls, module_name)
+        if table.column_exist('phone_number'):
+            cursor.execute(*sql_table.update(
+                columns=[sql_table.phone],
+                values=[contact_mech_table.value],
+                from_=[contact_mech_table],
+                where=sql_table.phone_number == contact_mech_table.id)
+            )
+        table.column_rename("phone_number", "phone_number_deprecated")
 
     @classmethod
     @route("/create-address", methods=["GET", "POST"])
@@ -846,11 +850,8 @@ class Address:
                 'party': party.id,
             }])
             if form.phone.data:
-                phone = party.add_contact_mechanism_if_not_exists(
-                    'phone', form.phone.data
-                )
                 cls.write([address], {
-                    'phone_number': phone.id
+                    'phone': form.phone.data
                 })
             return redirect(url_for('party.address.view_address'))
 
@@ -901,7 +902,6 @@ class Address:
         form = cls.get_address_form(address)
 
         if request.method == 'POST' and form.validate_on_submit():
-            party = request.nereid_user.party
             cls.write([address], {
                 'name': form.name.data,
                 'street': form.street.data,
@@ -912,11 +912,8 @@ class Address:
                 'subdivision': form.subdivision.data,
             })
             if form.phone.data:
-                phone = party.add_contact_mechanism_if_not_exists(
-                    'phone', form.phone.data
-                )
                 cls.write([address], {
-                    'phone_number': phone.id
+                    'phone': form.phone.data
                 })
             return redirect(url_for('party.address.view_address'))
 
