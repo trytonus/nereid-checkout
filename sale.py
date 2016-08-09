@@ -65,8 +65,12 @@ class Sale:
             domain.append(('state', '=', 'cancel'))
 
         elif filter_by == 'archived':
+            # only done and cancelled orders should be in archive
+            # irrespective of the date. Pre orders for example
+            # could be over 3 months old and still be in the
+            # processing state
             domain.append(
-                ('state', 'not in', ('draft', 'quotation'))
+                ('state', 'in', ('done', 'cancel'))
             )
 
             # Add a sale_date domain for recent orders.
