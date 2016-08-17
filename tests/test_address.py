@@ -5,16 +5,18 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 import trytond.tests.test_tryton
-from trytond.tests.test_tryton import POOL, USER, DB_NAME, CONTEXT
+from trytond.tests.test_tryton import POOL, USER, ModuleTestCase, \
+    with_transaction
 from trytond.transaction import Transaction
 
 from nereid.testing import NereidTestCase
 
 
-class TestAddress(NereidTestCase):
+class TestAddress(NereidTestCase, ModuleTestCase):
     """
     Test Address
     """
+    module = 'nereid_checkout'
 
     def setUp(self):
         trytond.tests.test_tryton.install_module('nereid_checkout')
@@ -115,9 +117,10 @@ class TestAddress(NereidTestCase):
         account_create_chart = POOL.get(
             'account.create_chart', type="wizard")
 
-        account_template, = AccountTemplate.search(
-            [('parent', '=', None)]
-        )
+        account_template, = AccountTemplate.search([
+            ('parent', '=', None),
+            ('name', '=', 'Minimal Account Chart')
+        ])
 
         session_id, _, _ = account_create_chart.create()
         create_chart = account_create_chart(session_id)
@@ -263,130 +266,130 @@ class TestAddress(NereidTestCase):
         """
         return self.templates.get(name)
 
+    @with_transaction()
     def test_0010_add_address(self):
         """
         Add an address for the user.
         """
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            self.setup_defaults()
-            app = self.get_app()
+        self.setup_defaults()
+        app = self.get_app()
 
-            registered_user = self.registered_user
+        registered_user = self.registered_user
 
-            address_data = {
-                'name': 'Name',
-                'street': 'Street',
-                'streetbis': 'StreetBis',
-                'zip': 'zip',
-                'city': 'City',
-                'phone': '1234567890',
-                'country': self.available_countries[0].id,
-                'subdivision': self.country_obj(
-                    self.available_countries[0]).subdivisions[0].id,
-            }
+        address_data = {
+            'name': 'Name',
+            'street': 'Street',
+            'streetbis': 'StreetBis',
+            'zip': 'zip',
+            'city': 'City',
+            'phone': '1234567890',
+            'country': self.available_countries[0].id,
+            'subdivision': self.country_obj(
+                self.available_countries[0]).subdivisions[0].id,
+        }
 
-            with app.test_client() as c:
-                response = c.post(
-                    '/en_US/login',
-                    data={
-                        'email': 'email@example.com',
-                        'password': 'password',
-                    }
-                )
-                self.assertEqual(response.status_code, 302)  # Login success
+        with app.test_client() as c:
+            response = c.post(
+                '/en_US/login',
+                data={
+                    'email': 'email@example.com',
+                    'password': 'password',
+                }
+            )
+            self.assertEqual(response.status_code, 302)  # Login success
 
-                self.assertEqual(len(registered_user.party.addresses), 0)
+            self.assertEqual(len(registered_user.party.addresses), 0)
 
-                # POST and a new address must be created
-                response = c.post('/en_US/create-address', data=address_data)
-                self.assertEqual(response.status_code, 302)
+            # POST and a new address must be created
+            response = c.post('/en_US/create-address', data=address_data)
+            self.assertEqual(response.status_code, 302)
 
-                # Re browse the record
-                registered_user = self.nereid_user_obj(
-                    self.registered_user.id
-                )
-                # Check if the user has one address now
-                self.assertEqual(len(registered_user.party.addresses), 1)
+            # Re browse the record
+            registered_user = self.nereid_user_obj(
+                self.registered_user.id
+            )
+            # Check if the user has one address now
+            self.assertEqual(len(registered_user.party.addresses), 1)
 
-                address, = registered_user.party.addresses
-                self.assertEqual(address.name, address_data['name'])
-                self.assertEqual(address.street, address_data['street'])
-                self.assertEqual(address.streetbis, address_data['streetbis'])
-                self.assertEqual(address.zip, address_data['zip'])
-                self.assertEqual(address.city, address_data['city'])
-                self.assertEqual(
-                    address.phone, address_data['phone']
-                )
-                self.assertEqual(address.country.id, address_data['country'])
-                self.assertEqual(
-                    address.subdivision.id, address_data['subdivision']
-                )
+            address, = registered_user.party.addresses
+            self.assertEqual(address.name, address_data['name'])
+            self.assertEqual(address.street, address_data['street'])
+            self.assertEqual(address.streetbis, address_data['streetbis'])
+            self.assertEqual(address.zip, address_data['zip'])
+            self.assertEqual(address.city, address_data['city'])
+            self.assertEqual(
+                address.phone, address_data['phone']
+            )
+            self.assertEqual(address.country.id, address_data['country'])
+            self.assertEqual(
+                address.subdivision.id, address_data['subdivision']
+            )
 
+    @with_transaction()
     def test_0020_edit_address(self):
         """
         Edit an address for the user
         """
-        with Transaction().start(DB_NAME, USER, context=CONTEXT):
-            self.setup_defaults()
-            app = self.get_app()
+        self.setup_defaults()
+        app = self.get_app()
 
-            registered_user = self.registered_user
-            address_data = {
-                'name': 'Name',
-                'street': 'Street',
-                'streetbis': 'StreetBis',
-                'zip': 'zip',
-                'city': 'City',
-                'phone': '1234567890',
-                'country': self.available_countries[0].id,
-                'subdivision': self.country_obj(
-                        self.available_countries[0]).subdivisions[0].id,
-            }
+        registered_user = self.registered_user
+        address_data = {
+            'name': 'Name',
+            'street': 'Street',
+            'streetbis': 'StreetBis',
+            'zip': 'zip',
+            'city': 'City',
+            'phone': '1234567890',
+            'country': self.available_countries[0].id,
+            'subdivision': self.country_obj(
+                    self.available_countries[0]).subdivisions[0].id,
+        }
 
-            with app.test_client() as c:
-                response = c.post(
-                    '/en_US/login',
-                    data={
-                        'email': 'email@example.com',
-                        'password': 'password',
-                    }
-                )
-                self.assertEqual(response.status_code, 302)  # Login success
+        with app.test_client() as c:
+            response = c.post(
+                '/en_US/login',
+                data={
+                    'email': 'email@example.com',
+                    'password': 'password',
+                }
+            )
+            self.assertEqual(response.status_code, 302)  # Login success
 
-                # Create an address that can be edited
-                self.assertEqual(len(registered_user.party.addresses), 0)
-                existing_address, = self.address_obj.create([{
-                    'party': registered_user.party.id,
-                }])
+            # Create an address that can be edited
+            self.assertEqual(len(registered_user.party.addresses), 0)
+            existing_address, = self.address_obj.create([{
+                'party': registered_user.party.id,
+            }])
 
-                response = c.get(
-                    '/en_US/edit-address/%d' % existing_address.id
-                )
-                self.assertTrue('ID:%s' % existing_address.id in response.data)
+            response = c.get(
+                '/en_US/edit-address/%d' % existing_address.id
+            )
+            self.assertTrue('ID:%s' % existing_address.id in response.data)
 
-                # POST to the existing address must updatethe existing address
-                response = c.post(
-                    '/en_US/edit-address/%d' % existing_address.id,
-                    data=address_data
-                )
-                self.assertEqual(response.status_code, 302)
+            # POST to the existing address must updatethe existing address
+            response = c.post(
+                '/en_US/edit-address/%d' % existing_address.id,
+                data=address_data
+            )
+            self.assertEqual(response.status_code, 302)
 
-                # Assert that the user has only 1 address
-                self.assertEqual(len(registered_user.party.addresses), 1)
+            # Assert that the user has only 1 address
+            self.assertEqual(len(registered_user.party.addresses), 1)
 
-                address = self.address_obj(existing_address.id)
-                self.assertEqual(address.name, address_data['name'])
-                self.assertEqual(address.street, address_data['street'])
-                self.assertEqual(address.streetbis, address_data['streetbis'])
-                self.assertEqual(address.zip, address_data['zip'])
-                self.assertEqual(address.city, address_data['city'])
-                self.assertEqual(
-                    address.phone, address_data['phone']
-                )
-                self.assertEqual(address.country.id, address_data['country'])
-                self.assertEqual(
-                    address.subdivision.id, address_data['subdivision']
-                )
+            address = self.address_obj(existing_address.id)
+            self.assertEqual(address.name, address_data['name'])
+            self.assertEqual(address.street, address_data['street'])
+            self.assertEqual(address.streetbis, address_data['streetbis'])
+            self.assertEqual(address.zip, address_data['zip'])
+            self.assertEqual(address.city, address_data['city'])
+            self.assertEqual(
+                address.phone, address_data['phone']
+            )
+            self.assertEqual(address.country.id, address_data['country'])
+            self.assertEqual(
+                address.subdivision.id, address_data['subdivision']
+            )
 
 
 def suite():

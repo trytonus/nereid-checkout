@@ -4,7 +4,7 @@ from datetime import datetime
 from functools import wraps
 
 from nereid import render_template, request, url_for, flash, redirect, \
-    current_app, current_user, route, login_required
+    current_app, current_user, route, login_required, current_website
 from nereid.signals import failed_login
 from nereid.globals import session
 from flask.ext.login import login_user
@@ -84,7 +84,7 @@ def sale_has_non_guest_party(function):
         NereidCart = Pool().get('nereid.cart')
         cart = NereidCart.open_cart()
         if cart.sale and \
-                cart.sale.party == request.nereid_website.guest_user.party:
+                cart.sale.party == current_website.guest_user.party:
             # The cart is owned by the guest user party
             current_app.logger.debug(
                 'Cart is owned by guest. Redirect to sign-in'
@@ -101,7 +101,7 @@ def with_company_context(function):
     @wraps(function)
     def wrapper(*args, **kwargs):
         with Transaction().set_context(
-                company=request.nereid_website.company.id):
+                company=current_website.company.id):
             return function(*args, **kwargs)
     return wrapper
 
@@ -224,7 +224,7 @@ class Checkout(ModelView):
 
         existing = NereidUser.search([
             ('email', '=', email),
-            ('company', '=', request.nereid_website.company.id),
+            ('company', '=', current_website.company.id),
         ])
 
         return not existing
@@ -263,7 +263,7 @@ class Checkout(ModelView):
         NereidUser = Pool().get('nereid.user')
         Party = Pool().get('party.party')
 
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             form = cls.sign_in_form(
                 email=current_user.email,
                 checkout_mode='account',
@@ -288,7 +288,7 @@ class Checkout(ModelView):
                 party_name = unicode(_(
                     'Guest with email: %(email)s', email=form.email.data
                 ))
-                if cart.sale.party == request.nereid_website.guest_user.party:
+                if cart.sale.party == current_website.guest_user.party:
                     # Create a party with the email as email, and session as
                     # name, but attach the session to it.
                     party, = Party.create([{
@@ -338,7 +338,7 @@ class Checkout(ModelView):
                 else:
                     failed_login.send()
 
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             # Registered user with a fresh login can directly proceed to
             # step 2, which is filling the shipping address
             #
@@ -408,13 +408,13 @@ class Checkout(ModelView):
         cart = NereidCart.open_cart()
 
         address = None
-        if current_user.is_anonymous() and cart.sale.shipment_address:
+        if current_user.is_anonymous and cart.sale.shipment_address:
             address = cart.sale.shipment_address
 
         address_form = cls.get_new_address_form(address)
 
         if request.method == 'POST':
-            if not current_user.is_anonymous() and request.form.get('address'):
+            if not current_user.is_anonymous and request.form.get('address'):
                 # Registered user has chosen an existing address
                 address = Address(request.form.get('address', type=int))
 
@@ -431,7 +431,7 @@ class Checkout(ModelView):
                 if not address_form.validate():
                     address = None
                 else:
-                    if current_user.is_anonymous() and \
+                    if current_user.is_anonymous and \
                             cart.sale.shipment_address:
                         # Save to the same address if the guest user
                         # is just trying to update the address
@@ -462,7 +462,7 @@ class Checkout(ModelView):
                 )
 
         addresses = []
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             addresses.extend(current_user.party.addresses)
 
         return render_template(
@@ -531,7 +531,7 @@ class Checkout(ModelView):
         cart = NereidCart.open_cart()
 
         address = None
-        if current_user.is_anonymous() and cart.sale.invoice_address:
+        if current_user.is_anonymous and cart.sale.invoice_address:
             address = cart.sale.invoice_address
 
         address_form = cls.get_new_address_form(address)
@@ -561,7 +561,7 @@ class Checkout(ModelView):
                         url_for('nereid.checkout.payment_method')
                     )
 
-            if not current_user.is_anonymous() and request.form.get('address'):
+            if not current_user.is_anonymous and request.form.get('address'):
                 # Registered user has chosen an existing address
                 address = Address(request.form.get('address', type=int))
 
@@ -579,7 +579,7 @@ class Checkout(ModelView):
                     address = None
                 else:
                     if (
-                        current_user.is_anonymous() and
+                        current_user.is_anonymous and
                         cart.sale.invoice_address and
                         cart.sale.invoice_address != cart.sale.shipment_address
                     ):
@@ -613,7 +613,7 @@ class Checkout(ModelView):
                 )
 
         addresses = []
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             addresses.extend(current_user.party.addresses)
 
         return render_template(
@@ -646,7 +646,7 @@ class Checkout(ModelView):
         ]
 
         # add profiles of the registered user
-        if not current_user.is_anonymous():
+        if not current_user.is_anonymous:
             payment_form.payment_profile.choices = [
                 (p.id, p.rec_name) for p in
                 current_user.party.get_payment_profiles()
@@ -672,7 +672,7 @@ class Checkout(ModelView):
         payment_form = cls.get_payment_form()
         credit_card_form = cls.get_credit_card_form()
 
-        if not current_user.is_anonymous() and \
+        if not current_user.is_anonymous and \
                 payment_form.payment_profile.data:
             # Regd. user with payment_profile
             rv = cart.sale._add_sale_payment(
@@ -700,7 +700,7 @@ class Checkout(ModelView):
                 return rv
             return cls.confirm_cart(cart)
 
-        elif request.nereid_website.credit_card_gateway and \
+        elif current_website.credit_card_gateway and \
                 credit_card_form.validate():
             # validate the credit card form and checkout using that
             cart.sale._add_sale_payment(
@@ -752,7 +752,7 @@ class Checkout(ModelView):
                 # Return if BaseResponse
                 return rv
 
-            flash(_("Error is processing payment."), "warning")
+            flash(_("Error in processing payment."), "warning")
 
         return render_template(
             'checkout/payment_method.jinja',
@@ -798,14 +798,14 @@ class Address:
     @classmethod
     def __register__(cls, module_name):
         TableHandler = backend.get('TableHandler')
-        cursor = Transaction().cursor
+        cursor = Transaction().connection.cursor()
         ContactMech = Pool().get('party.contact_mechanism')
         sql_table = cls.__table__()
         contact_mech_table = ContactMech.__table__()
 
         super(Address, cls).__register__(module_name)
 
-        table = TableHandler(cursor, cls, module_name)
+        table = TableHandler(cls, module_name)
         if table.column_exist('phone_number'):
             cursor.execute(*sql_table.update(
                 columns=[sql_table.phone],
@@ -838,7 +838,7 @@ class Address:
         form = cls.get_address_form()
 
         if request.method == 'POST' and form.validate_on_submit():
-            party = request.nereid_user.party
+            party = current_user.party
             address, = cls.create([{
                 'name': form.name.data,
                 'street': form.street.data,
@@ -895,7 +895,7 @@ class Address:
             return cls.create_address()
 
         address = cls(address)
-        if address.party != request.nereid_user.party:
+        if address.party != current_user.party:
             # Check if the address belong to party
             abort(403)
 
