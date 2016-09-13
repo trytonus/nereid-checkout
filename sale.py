@@ -79,12 +79,14 @@ class Sale:
             ))
 
         else:
-            domain.append(('state', 'not in', ('draft', 'quotation', 'cancel')))
-
-            # Add a sale_date domain for recent orders.
-            domain.append((
-                'sale_date', '>=', req_date
-            ))
+            domain.append([
+                'OR',
+                ('state', 'in', ('confirmed', 'processing')),
+                [
+                    ('state', 'in', ('done', 'cancel')),
+                    ('sale_date', '>=', req_date),
+                ]
+            ])
 
         # Handle order duration
         sales = Pagination(cls, domain, page, cls.per_page)
