@@ -336,6 +336,7 @@ class Checkout(ModelView):
                         url_for('nereid.checkout.shipping_address')
                     )
                 else:
+                    flash(_('Either username or password is incorrect'))
                     failed_login.send()
 
         if not current_user.is_anonymous:
