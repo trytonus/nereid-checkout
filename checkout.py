@@ -20,6 +20,7 @@ from trytond.transaction import Transaction
 from trytond import backend
 
 from .i18n import _
+from .signals import cart_address_updated
 
 __all__ = ['Cart', 'Party', 'Checkout', 'Party', 'Address']
 __metaclass__ = PoolMeta
@@ -457,6 +458,7 @@ class Checkout(ModelView):
                 # Finally save the address to the shipment
                 cart.sale.shipment_address = address
                 cart.sale.save()
+                cart_address_updated.send(cart)
 
                 return redirect(
                     url_for('nereid.checkout.validate_address')
